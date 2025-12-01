@@ -2,10 +2,29 @@ import "./App.css";
 import { useState } from "react";
 
 function App() {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(""); //Text Input
+  const [tasks, setTasks] = useState<Task[]>([]); //List Tasks
+  type Task = {
+    id: number;
+    text: string;
+    done: boolean;
+  };
 
   function changeInput(event: React.ChangeEvent<HTMLInputElement>) {
     setInputValue(event.target.value);
+  }
+  function handleAddTask() {
+    const trimmed = inputValue.trim();
+    if (!trimmed) return;
+
+    const newTask: Task = {
+      id: Date.now(),
+      text: trimmed,
+      done: false,
+    };
+
+    setTasks([...tasks, newTask]);
+    setInputValue("");
   }
   return (
     <div>
@@ -18,9 +37,14 @@ function App() {
           value={inputValue}
           onChange={changeInput}
         ></input>
-        <button></button>
+        <button onClick={handleAddTask}>Add</button>
       </label>
       <p>Eingabewert: {inputValue}</p>
+      <ul>
+        {tasks.map((task) => (
+          <li key={task.id}>{task.text}</li>
+        ))}
+      </ul>
     </div>
   );
 }
