@@ -1,21 +1,22 @@
 import "./App.css";
 import { useState } from "react";
 
+type Task = {
+  id: number;
+  text: string;
+  done: boolean;
+};
+
 function App() {
   const [inputValue, setInputValue] = useState(""); //Text Input
   const [tasks, setTasks] = useState<Task[]>([]); //List Tasks
-  type Task = {
-    id: number;
-    text: string;
-    done: boolean;
-  };
 
   function changeInput(event: React.ChangeEvent<HTMLInputElement>) {
     setInputValue(event.target.value);
   }
   function handleAddTask() {
     const trimmed = inputValue.trim();
-    if (!trimmed) return;
+    if (!trimmed) return; // nix hinzufügen, wenn leer
 
     const newTask: Task = {
       id: Date.now(),
@@ -25,6 +26,30 @@ function App() {
 
     setTasks([...tasks, newTask]);
     setInputValue("");
+  }
+
+  function handleToggleTask(id: number) {
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === id) {
+        return {
+          ...task,
+          done: !task.done,
+        };
+      }
+      return task;
+    });
+
+    setTasks(updatedTasks);
+
+    const toggledTask = updatedTasks.find((task) => task.id === id);
+
+    if (toggledTask?.done) {
+      setTimeout(() => {
+        setTasks((currentTasks) =>
+          currentTasks.filter((task) => task.id !== id)
+        );
+      }, 10000);
+    }
   }
   return (
     <div>
@@ -42,7 +67,16 @@ function App() {
       <p>Eingabewert: {inputValue}</p>
       <ul>
         {tasks.map((task) => (
-          <li key={task.id}>{task.text}</li>
+          <li key={task.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={task.done}
+                onChange={() => handleToggleTask(task.id)}
+              />
+              <span className={task.done ? "done" : ""}>{task.text}</span>
+            </label>
+          </li>
         ))}
       </ul>
     </div>
